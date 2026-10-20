@@ -29,6 +29,8 @@ function resourceLabel(url: string) {
 }
 
 function App() {
+  const isLocal = ['127.0.0.1', 'localhost', '[::1]'].includes(window.location.hostname);
+  const [engine, setEngine] = useState(isLocal ? 'local' : 'google');
   const [url, setUrl] = useState('');
   const [device, setDevice] = useState<Device>('mobile');
   const [key, setKey] = useState('');
@@ -60,8 +62,25 @@ function App() {
     setBusy(true);
     const request = new AbortController();
     controller.current = request;
-    const timeout = setTimeout(() => request.abort('timeout'), 120000);
+    const timeout = setTimeout(() => request.abort('timeout'), 150000);
     try {
+      if (engine === 'local') {
+        const localResponse = await fetch(`${import.meta.env.BASE_URL}api/audit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: target, device }),
+          signal: request.signal,
+        });
+        if (localResponse.status === 404)
+          throw new Error(
+            'The local engine is unavailable. Start this project with npm run dev or npm run preview.',
+          );
+        const localResult = await localResponse.json();
+        if (!localResponse.ok)
+          throw new Error(localResult.error || 'Local Lighthouse could not finish this audit.');
+        show(localResult, 'Local Lighthouse');
+        return;
+      }
       const response = await fetch(buildApiUrl(target, device, key), {
         signal: request.signal,
         referrerPolicy: 'no-referrer',
@@ -87,7 +106,9 @@ function App() {
             ? 'The audit timed out. Try again or import a Lighthouse report.'
             : 'Audit canceled. You can start another run.'
           : e instanceof TypeError
-            ? 'Could not reach PageSpeed Insights. Check your connection or import a Lighthouse report.'
+            ? engine === 'local'
+              ? 'Could not reach the local audit engine. Restart npm run dev and try again.'
+              : 'Could not reach PageSpeed Insights. Check your connection or import a Lighthouse report.'
             : (e as Error).message,
       );
     } finally {
@@ -193,6 +214,18 @@ function App() {
                 autoComplete="url"
               />
             </div>
+            <div className="engine-field">
+              <label htmlFor="engine">Audit engine</label>
+              <select
+                id="engine"
+                value={engine}
+                onChange={(e) => setEngine(e.target.value)}
+                disabled={busy}
+              >
+                {isLocal && <option value="local">Local Chrome · no key</option>}
+                <option value="google">Google PageSpeed</option>
+              </select>
+            </div>
             <div className="device-field">
               <label htmlFor="device">Test device</label>
               <select
@@ -246,8 +279,9 @@ function App() {
           <details className="api-options">
             <summary>API key & how this works</summary>
             <p>
-              URL audits send the website address to Google PageSpeed Insights. Public quota can run
-              out. Use your own restricted key or import a report exported from Chrome DevTools →
+              Local Chrome runs Lighthouse on this computer in a temporary browser profile. No
+              Google API key is needed. Google PageSpeed sends the website address to Google; its
+              public quota can run out. You can also import a report exported from Chrome DevTools →
               Lighthouse → Save as JSON.
             </p>
             <label htmlFor="api-key">Your PageSpeed API key (optional)</label>
@@ -267,14 +301,18 @@ function App() {
               contain URLs and query parameters.
             </p>
             <p>
-              Without a key, run <code>npm run audit -- https://your-website.com</code> locally,
-              then import the generated report. See the GitHub README for setup.
+              Choose Local Chrome above when running this app with npm run dev or npm run preview.
+              The command <code>npm run audit -- https://your-website.com</code> and JSON import
+              remain available as alternatives.
             </p>
           </details>
           {busy && (
             <div className="status" role="status">
               <span className="spinner" aria-hidden="true" />
-              Google is running a lab test. This can take up to two minutes.
+              {engine === 'local'
+                ? 'Chrome is running Lighthouse on this computer.'
+                : 'Google is running a lab test.'}{' '}
+              This can take up to two minutes.
               <button
                 className="text-button"
                 type="button"

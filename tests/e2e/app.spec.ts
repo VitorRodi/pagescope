@@ -43,6 +43,7 @@ test('explains quota failures and keeps the API key out of browser storage', asy
   );
   await page.goto('/');
   await page.getByLabel('Website URL').fill('https://example.com');
+  await page.getByLabel('Audit engine').selectOption('google');
   await page.getByText('API key & how this works', { exact: true }).click();
   await page.getByLabel('Your PageSpeed API key (optional)').fill('test-key-not-a-secret');
   await page.getByRole('button', { name: 'Analyze website' }).click();
@@ -58,11 +59,27 @@ test('renders a successful API response and sends the selected device', async ({
   });
   await page.goto('/');
   await page.getByLabel('Website URL').fill('https://example.com/?a=1&b=2');
+  await page.getByLabel('Audit engine').selectOption('google');
   await page.getByLabel('Test device').selectOption('desktop');
   await page.getByRole('button', { name: 'Analyze website' }).click();
   await expect(page.getByText('PageSpeed Insights', { exact: true })).toBeVisible();
   expect(new URL(requested).searchParams.get('strategy')).toBe('desktop');
   expect(new URL(requested).searchParams.get('url')).toBe('https://example.com/?a=1&b=2');
+});
+
+test('uses the local engine from the analyze button without contacting Google', async ({
+  page,
+}) => {
+  let googleCalls = 0;
+  page.on('request', (request) => {
+    if (request.url().includes('googleapis.com')) googleCalls++;
+  });
+  await page.route('**/api/audit', (route) => route.fulfill({ json: fixture() }));
+  await page.goto('/');
+  await page.getByLabel('Website URL').fill('https://example.com');
+  await page.getByRole('button', { name: 'Analyze website' }).click();
+  await expect(page.getByText('Local Lighthouse', { exact: true })).toBeVisible();
+  expect(googleCalls).toBe(0);
 });
 
 test('mobile layout fits the viewport and invalid imports produce a useful error', async ({

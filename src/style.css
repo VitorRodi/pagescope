@@ -185,6 +185,9 @@ label {
 .device-field {
   width: 140px;
 }
+.engine-field {
+  width: 210px;
+}
 input,
 select {
   width: 100%;
@@ -689,6 +692,9 @@ footer p {
   }
 }
 @media (max-width: 580px) {
+  .engine-field {
+    width: 100%;
+  }
   main {
     padding: 0 18px;
   }

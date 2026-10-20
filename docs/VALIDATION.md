@@ -17,3 +17,11 @@ This repository publishes source code. No hosted deployment or LinkedIn publicat
 ## RIVO identity revision
 
 Renamed to RIVO PageScope, with repository URL `https://github.com/VitorRodi/rivo-pagescope`. Applied the existing RIVO black/white/graphite/silver palette, original wordmark and app icon, and locally bundled Inter. The font license is included. Runtime, comparison logic, and measurement boundaries are unchanged. Desktop, mobile, measured-import, and sample-card images were refreshed for the RIVO theme.
+
+## Fix: URL analysis without Google quota
+
+The original Analyze website button depended on Google even when running locally. Browser reproduction confirmed HTTP 429. Local Chrome is now the default engine on localhost and the Vite dev/preview server runs Lighthouse directly, returning its measured report to the interface. This is a local capability, not a hosted public audit service. Google remains an explicit alternative for static deployments.
+
+The local endpoint has regression checks for same-origin access, URL/device validation, and recovery from a Chrome failure. A separate regression catches Chrome launcher cleanup returning void on Windows, which must not discard a completed report. Browser tests cover local engine selection with no Google request; an actual Chrome audit is verified separately, without a fixture, via the interface.
+
+Final local verification: 30 unit/integration tests and 6 browser tests passed; TypeScript/Vite production build passed. Clicking Analyze website for `https://example.com` in the actual browser returned HTTP 200 from `/api/audit`, displayed `Local Lighthouse` with 2 recorded requests, and made no PageSpeed API request. See `local-audit-verified.png`. Google mode continues to depend on Google quota; static hosting does not acquire a Chrome backend from this change.

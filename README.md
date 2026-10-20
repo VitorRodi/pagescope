@@ -2,11 +2,12 @@
 
 **See what makes a website heavy.** RIVO PageScope turns Lighthouse JSON reports into a visual breakdown of page weight, network requests, and lab metrics. Built with React and TypeScript, using RIVO's black, white, graphite, and silver identity.
 
-![RIVO PageScope interface](docs/pagescope-desktop.png)
+![RIVO PageScope displaying an actual local Lighthouse run](docs/local-audit-verified.png)
 
 ## What you can do
 
-- Audit a public URL on mobile or desktop through Google PageSpeed Insights.
+- Audit a public URL on mobile or desktop using local Chrome, without an API key.
+- Optionally switch to Google PageSpeed Insights for a remote audit.
 - Import Lighthouse or PageSpeed JSON files locally, without uploading them.
 - See transferred bytes grouped into images, JavaScript, CSS, fonts, HTML, and other resources.
 - Filter a request waterfall by filename, domain, or resource type.
@@ -26,7 +27,9 @@ npm ci
 npm run dev
 ```
 
-Open the local address printed by Vite. The application is a static client: no database, account, server-side URL fetcher, or paid service is required.
+Open the local address printed by Vite. **Local Chrome is selected by default** on localhost. Enter a website URL and select **Analyze website**; the local engine runs Lighthouse and displays the report automatically. Chrome must be installed. No API key, JSON import, database, or account is needed for this flow.
+
+Vite's development and preview servers include a local-only audit endpoint. It accepts same-origin requests from the loopback interface, validates the URL/device, runs one audit at a time, and cancels Chrome when the client disconnects. Do not expose this development server as a public audit service. A static deployment of `dist/` has no local Chrome endpoint: it supports Google PageSpeed and JSON import instead.
 
 ### Get a real report without an API key
 
@@ -43,11 +46,13 @@ Alternatively, open Chrome DevTools → Lighthouse, run a navigation performance
 
 ### URL audits and API quota
 
-The **Analyze website** action sends your URL to the [PageSpeed Insights API](https://developers.google.com/speed/docs/insights/v5/get-started). Anonymous quota may be exhausted; during development the real API returned HTTP 429. PageScope explains this instead of inventing results.
+With **Local Chrome**, the website is visited from your computer in a temporary browser profile, and no Google API request is made. The result appears directly in the app. Only audit websites you are allowed to test.
+
+With **Google PageSpeed** selected, **Analyze website** sends your URL to the [PageSpeed Insights API](https://developers.google.com/speed/docs/insights/v5/get-started). Anonymous quota may be exhausted; development and browser reproduction both confirmed HTTP 429. The local engine avoids this dependency on localhost.
 
 You can optionally enter your own Google PageSpeed API key under **API key & how this works**. It is kept only in React memory and sent directly to Google. Do not commit keys. Restrict browser keys to the PageSpeed API and your website's HTTP referrers. This is a browser-visible key, not a server secret.
 
-If the public quota is unavailable, use the local command or import a DevTools report. A successful live Google audit with a user-provided key has not been verified in this repository's initial validation.
+If the public quota is unavailable, switch to Local Chrome when using this app locally. The local command and DevTools JSON import remain available. A successful live Google audit with a user-provided key has not been verified.
 
 ## Before and after
 
@@ -69,7 +74,7 @@ Negative byte and timing deltas mean less; positive score deltas mean higher. Di
 
 ## Privacy
 
-Imported files, baseline reports, and API keys remain in memory; closing or reloading the tab clears them. There are no analytics, cookies, localStorage, or sessionStorage writes. Imports do not trigger remote requests for report resources. URL audits send the target URL to Google. Exporting a card downloads a PNG locally. Reports may contain sensitive URLs and query parameters: inspect files before sharing them. The summary card includes the hostname, not the query string.
+Imported files, baseline reports, and API keys remain in memory; closing or reloading the tab clears them. There are no analytics, cookies, localStorage, or sessionStorage writes. Imports do not trigger remote requests for report resources. Local Chrome visits the target website from a temporary local browser profile; Google PageSpeed sends the target URL to Google. The local endpoint returns its report without writing a report file (the separate CLI command saves to `reports/`). Exporting a card downloads a PNG locally. Reports may contain sensitive URLs and query parameters: inspect files before sharing them. The summary card includes the hostname, not the query string.
 
 ## Verify
 
