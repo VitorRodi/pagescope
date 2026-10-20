@@ -1,8 +1,8 @@
-# PageScope
+# RIVO PageScope
 
-**See what makes a website heavy.** PageScope turns Lighthouse JSON reports into a visual breakdown of page weight, network requests, and lab metrics. Built with React and TypeScript.
+**See what makes a website heavy.** RIVO PageScope turns Lighthouse JSON reports into a visual breakdown of page weight, network requests, and lab metrics. Built with React and TypeScript, using RIVO's black, white, graphite, and silver identity.
 
-![PageScope interface](docs/pagescope-desktop.png)
+![RIVO PageScope interface](docs/pagescope-desktop.png)
 
 ## What you can do
 
@@ -20,8 +20,8 @@
 Requires **Node.js 22.19+** (Node 24 also works) and npm.
 
 ```sh
-git clone https://github.com/VitorRodi/pagescope.git
-cd pagescope
+git clone https://github.com/VitorRodi/rivo-pagescope.git
+cd rivo-pagescope
 npm ci
 npm run dev
 ```
@@ -94,4 +94,4 @@ tests/                 Parser/CLI tests and browser flows
 
 ## Credits
 
-[Lighthouse](https://github.com/GoogleChrome/lighthouse) supplies the underlying audits and [PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/reference/pagespeedapi/runpagespeed) supplies remote runs. PageScope is an independent visualization project by [Vitor Rodi](https://github.com/VitorRodi), not a Google product. Lighthouse is Apache-2.0; PageScope's original code is MIT licensed.
+[Lighthouse](https://github.com/GoogleChrome/lighthouse) supplies the underlying audits and [PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/reference/pagespeedapi/runpagespeed) supplies remote runs. RIVO PageScope is a visualization project by [Vitor Rodi](https://github.com/VitorRodi), not a Google product. Lighthouse is Apache-2.0; the original application code is MIT licensed. Inter is bundled under SIL OFL 1.1. RIVO logos are preserved brand assets; the software license does not grant trademark rights.

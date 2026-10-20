@@ -1,13 +1,21 @@
-# Design direction
+# RIVO PageScope — design direction
 
-PageScope is a workbench for developers investigating page weight. Its single job is to make a Lighthouse report understandable enough to decide what to inspect next.
+A workbench for developers investigating page weight. Its single job is to make a Lighthouse report understandable enough to decide what to inspect next.
 
-- Canvas: cool paper `#f3f6fa`; panels: white `#ffffff`; ink: deep slate `#182739`.
-- Accent: instrument blue `#2459de`; images: turquoise `#188b89`; fonts: ochre `#b87916`; CSS: violet `#835dc5`; documents: slate `#64748b`.
-- Display: Trebuchet MS (system fallback, characterful compact headings); body: Segoe UI/system; data: Consolas/ui-monospace. No external font requests.
-- Layout: quiet masthead, large left-aligned purpose, compact audit form, then an asymmetric workbench with page-weight anatomy and a metric rail. Full-width request timeline below.
-- Signature: a single segmented "weight strip" maps transferred bytes to resource categories; the same colors follow each request into the waterfall. Width always encodes bytes, never decoration.
+## RIVO identity
 
-The first idea was a generic score dashboard. Revised to lead with the page's actual resource anatomy: a score alone does not explain the problem. Avoid decorative gradients, glass panels, invented live activity, and success claims.
+- Black `#0A0A0A`, white `#FFFFFF`, graphite `#2A2A2A`, silver `#C0C0C6`.
+- Inter for headings and body, bundled locally; Consolas/ui-monospace for data. No remote font service.
+- Official RIVO custom wordmark as an unmodified image. Product name sits alongside it, separated by a quiet rule. The favicon uses the original app icon.
+- Dark canvas and restrained panels. White primary action, silver supporting text, visible white keyboard focus. Error color has semantic use only.
+- Resource categories use neutral shades from white to graphite. Every category also has a text label; color alone never identifies a resource.
 
-Mobile: stack panels, keep resource names and values readable, horizontally scroll only the timeline if needed. Visible focus, labeled inputs, reduced-motion support, real loading/cancel/error states, unknown data rendered as unavailable.
+## Composition
+
+Quiet masthead → left-aligned purpose → compact audit form → asymmetric workbench with resource anatomy and metric rail → full-width request timeline.
+
+The segmented weight strip remains the signature: its widths encode transferred bytes and the same shades follow each resource into the waterfall. The redesign changes the original blue dashboard into RIVO's monochrome product family, without changing how reports are measured.
+
+The PNG export uses the same palette, locally loaded Inter, and original wordmark. Its example label and measurement boundaries remain visible.
+
+Mobile stacks panels and keeps values readable. Visible focus, labeled inputs, reduced-motion support, real loading/cancel/error states, and unknown data are preserved. No decorative neon, generated logos, or claims of measured results from synthetic data.

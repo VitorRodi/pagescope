@@ -13,3 +13,7 @@ Verified on Windows with Node 22.22.2 and Google Chrome, using a temporary headl
 No report, API key, private project file, or signed-in browser profile is committed. The generated raw report remains in the gitignored `reports/` folder.
 
 This repository publishes source code. No hosted deployment or LinkedIn publication is implied.
+
+## RIVO identity revision
+
+Renamed to RIVO PageScope, with repository URL `https://github.com/VitorRodi/rivo-pagescope`. Applied the existing RIVO black/white/graphite/silver palette, original wordmark and app icon, and locally bundled Inter. The font license is included. Runtime, comparison logic, and measurement boundaries are unchanged. Desktop, mobile, measured-import, and sample-card images were refreshed for the RIVO theme.

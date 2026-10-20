@@ -135,15 +135,17 @@ function App() {
   return (
     <>
       <header className="masthead">
-        <a className="brand" href="./" aria-label="PageScope home">
-          <span className="brand-symbol" aria-hidden="true">
-            ▥
-          </span>{' '}
-          PageScope
+        <a className="brand" href="./" aria-label="RIVO PageScope home">
+          <img
+            className="brand-wordmark"
+            src={`${import.meta.env.BASE_URL}brand/rivo-wordmark-dark.png`}
+            alt="RIVO"
+          />
+          <span className="brand-product">PageScope</span>
         </a>
         <a
           className="source-link"
-          href="https://github.com/VitorRodi/pagescope"
+          href="https://github.com/VitorRodi/rivo-pagescope"
           target="_blank"
           rel="noreferrer"
         >
@@ -614,7 +616,7 @@ function App() {
         )}
         <footer>
           <p>
-            Built by{' '}
+            RIVO PageScope. Built by{' '}
             <a href="https://github.com/VitorRodi" target="_blank" rel="noreferrer">
               Vitor Rodi
             </a>

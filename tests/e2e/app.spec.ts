@@ -12,31 +12,27 @@ test('explores an explicitly labeled example, filters requests and downloads a s
   await expect(page.locator('.request-row')).toHaveCount(1);
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export PNG card' }).click();
-  expect((await download).suggestedFilename()).toBe('pagescope-example.png');
+  expect((await download).suggestedFilename()).toBe('rivo-pagescope-example.png');
 });
 
 test('imports a real-format report and compares a second run without uploading files', async ({
   page,
 }) => {
   await page.goto('/');
-  await page
-    .getByLabel('Import Lighthouse JSON')
-    .setInputFiles({
-      name: 'before.json',
-      mimeType: 'application/json',
-      buffer: Buffer.from(JSON.stringify(fixture())),
-    });
+  await page.getByLabel('Import Lighthouse JSON').setInputFiles({
+    name: 'before.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(fixture())),
+  });
   await expect(page.getByText('Imported report', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Set as baseline' }).click();
   const after = fixture();
   after.audits['largest-contentful-paint'].numericValue = 2400;
-  await page
-    .getByLabel('Import Lighthouse JSON')
-    .setInputFiles({
-      name: 'after.json',
-      mimeType: 'application/json',
-      buffer: Buffer.from(JSON.stringify(after)),
-    });
+  await page.getByLabel('Import Lighthouse JSON').setInputFiles({
+    name: 'after.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(after)),
+  });
   await expect(page.getByRole('heading', { name: 'Before → after' })).toBeVisible();
   await expect(page.getByTestId('lcp-delta')).toHaveText('-1.20 s');
 });
