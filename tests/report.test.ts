@@ -4,6 +4,9 @@ import { normalizeUrl, parseReport, compareReports, buildApiUrl } from '../src/r
 import { fixture } from './fixture';
 
 describe('URL input', () => {
+  it('accepts a hostname with an explicit port without mistaking it for a URL scheme', () => {
+    expect(normalizeUrl('example.com:8443/path')).toBe('https://example.com:8443/path');
+  });
   it('adds HTTPS and removes fragments without dropping query parameters', () => {
     expect(normalizeUrl(' example.com/path?q=a#part ')).toBe('https://example.com/path?q=a');
   });
@@ -28,6 +31,19 @@ describe('URL input', () => {
 });
 
 describe('Lighthouse reports', () => {
+  it('does not recommend a passed audit as a performance opportunity', () => {
+    const input: any = fixture();
+    input.audits['server-response-time'] = {
+      title: 'Initial server response time was short',
+      score: 1,
+      details: { overallSavingsMs: 450 },
+    };
+    expect(
+      parseReport(input).opportunities.some(
+        (row) => row.title === 'Initial server response time was short',
+      ),
+    ).toBe(false);
+  });
   it('uses resource-summary when network rows are absent, excludes its total row from category sums', () => {
     const input: any = fixture();
     delete input.audits['network-requests'];

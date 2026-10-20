@@ -10,7 +10,7 @@
 - Optionally switch to Google PageSpeed Insights for a remote audit.
 - Import Lighthouse or PageSpeed JSON files locally, without uploading them.
 - See transferred bytes grouped into images, JavaScript, CSS, fonts, HTML, and other resources.
-- Filter a request waterfall by filename, domain, or resource type.
+- Filter a request waterfall by filename, domain, or resource type. Sort by start time or largest transferred size.
 - Inspect LCP, FCP, TBT, CLS, and the Lighthouse performance score.
 - Set a report as the baseline, then analyze or import a second run to compare changes.
 - Export a 1200 × 675 PNG summary card. No automatic social posting.

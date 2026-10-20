@@ -15,6 +15,29 @@ test('explores an explicitly labeled example, filters requests and downloads a s
   expect((await download).suggestedFilename()).toBe('rivo-pagescope-example.png');
 });
 
+test('can find the heaviest request without changing chronological audit data', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Explore example' }).click();
+  await page.getByLabel('Sort requests').selectOption('size');
+  await expect(page.locator('.request-row').first()).toContainText('hero.jpg');
+  await page.getByLabel('Sort requests').selectOption('timeline');
+  await expect(page.locator('.request-row').first()).toContainText('example.com');
+});
+
+test('explains a missing local server instead of showing a JSON parsing error', async ({
+  page,
+}) => {
+  await page.route('**/api/audit', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<html>Static host</html>' }),
+  );
+  await page.goto('/');
+  await page.getByLabel('Website URL').fill('https://example.com');
+  await page.getByRole('button', { name: 'Analyze website' }).click();
+  await expect(page.getByRole('alert')).toContainText('local engine is unavailable');
+});
+
 test('imports a real-format report and compares a second run without uploading files', async ({
   page,
 }) => {
@@ -93,4 +116,24 @@ test('mobile layout fits the viewport and invalid imports produce a useful error
     .getByLabel('Import Lighthouse JSON')
     .setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{}') });
   await expect(page.getByRole('alert')).toContainText('Lighthouse');
+});
+
+test('long URLs in real audit warnings wrap on a mobile screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const input = {
+    ...fixture(),
+    runWarnings: [
+      'The page redirected from https://example.com/' + 'a'.repeat(180) + '/index.html',
+    ],
+  };
+  await page
+    .getByLabel('Import Lighthouse JSON')
+    .setInputFiles({
+      name: 'warning.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify(input)),
+    });
+  await expect(page.getByText('Lighthouse run warnings')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

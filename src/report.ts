@@ -36,7 +36,10 @@ export function normalizeUrl(value: string): string {
   let url: URL;
   const input = value.trim();
   try {
-    url = new URL(/^[a-z][a-z\d+.-]*:/i.test(input) ? input : `https://${input}`);
+    const hostnameWithPort = /^[a-z\d.-]+:\d+(?:[/?#]|$)/i.test(input);
+    url = new URL(
+      !hostnameWithPort && /^[a-z][a-z\d+.-]*:/i.test(input) ? input : `https://${input}`,
+    );
   } catch {
     throw new Error('Enter a valid public website URL.');
   }
@@ -66,9 +69,7 @@ export function normalizeUrl(value: string): string {
     host.includes(':') ||
     privateIP
   ) {
-    throw new Error(
-      'Enter a public website. Local and private addresses cannot be tested by Google.',
-    );
+    throw new Error('Enter a public website. Local and private addresses are not supported.');
   }
   url.hash = '';
   return url.href;
@@ -158,6 +159,7 @@ export function parseReport(value: unknown): Report {
   const opportunities = Object.values(audits)
     .map(object)
     .filter((audit) => {
+      if (audit.score === 1) return false;
       const details = object(audit.details);
       return (
         (number(details.overallSavingsMs) ?? 0) > 0 ||

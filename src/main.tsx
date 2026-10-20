@@ -40,6 +40,7 @@ function App() {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('');
   const [type, setType] = useState('All types');
+  const [sort, setSort] = useState('timeline');
   const controller = useRef<AbortController | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
@@ -48,6 +49,7 @@ function App() {
     setError('');
     setFilter('');
     setType('All types');
+    setSort('timeline');
   }
   async function analyze(event: React.FormEvent) {
     event.preventDefault();
@@ -71,7 +73,10 @@ function App() {
           body: JSON.stringify({ url: target, device }),
           signal: request.signal,
         });
-        if (localResponse.status === 404)
+        if (
+          localResponse.status === 404 ||
+          !localResponse.headers.get('content-type')?.includes('application/json')
+        )
           throw new Error(
             'The local engine is unavailable. Start this project with npm run dev or npm run preview.',
           );
@@ -145,6 +150,11 @@ function App() {
         (type === 'All types' || row.group === type) &&
         row.url.toLowerCase().includes(filter.toLowerCase()),
     ) ?? [];
+  displayed.sort(
+    sort === 'size'
+      ? (a, b) => b.bytes - a.bytes
+      : (a, b) => (a.start ?? Infinity) - (b.start ?? Infinity),
+  );
   const timed = report?.requests.filter((row) => row.start !== null && row.duration !== null) ?? [];
   const end = timed.reduce((latest, row) => Math.max(latest, row.start! + row.duration!), 1);
   const totalGrouped = report?.groups.reduce((sum, g) => sum + g.bytes, 0) ?? 0;
@@ -548,6 +558,14 @@ function App() {
                 <span className="tag">Observed network timings</span>
               </div>
               <div className="filters">
+                <select
+                  aria-label="Sort requests"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                >
+                  <option value="timeline">Start time</option>
+                  <option value="size">Largest transfer</option>
+                </select>
                 <input
                   aria-label="Filter requests"
                   placeholder="Find a file or domain…"
