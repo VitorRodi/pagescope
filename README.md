@@ -1,5 +1,7 @@
 # RIVO PageScope
 
+[![Verify](https://github.com/VitorRodi/rivo-pagescope/actions/workflows/ci.yml/badge.svg)](https://github.com/VitorRodi/rivo-pagescope/actions/workflows/ci.yml)
+
 **See what makes a website heavy.** RIVO PageScope turns Lighthouse JSON reports into a visual breakdown of page weight, network requests, and lab metrics. Built with React and TypeScript, using RIVO's black, white, graphite, and silver identity.
 
 ![RIVO PageScope displaying an actual local Lighthouse run](docs/local-audit-verified.png)
@@ -62,6 +64,13 @@ If the public quota is unavailable, switch to Local Chrome when using this app l
 4. Import the new report, or analyze the same URL again.
 
 Negative byte and timing deltas mean less; positive score deltas mean higher. Different URLs, device settings, throttling/screen settings, or Lighthouse versions produce comparison warnings. Run repeated measurements under equivalent conditions before claiming a performance improvement. No percentage speedup is inferred from a score change.
+
+## Engineering decisions
+
+- **Separate report parsing from presentation.** Report normalization and comparison logic live in `src/report.ts`, independently of the React interface.
+- **Support local audits and imported reports.** Local Lighthouse runs and JSON import provide alternatives when the remote PageSpeed API is unavailable.
+- **Expose measurement limits.** Reports represent lab runs; comparisons warn about differences in device, URL, settings, or Lighthouse version.
+- **Test failure paths as well as results.** Parser and browser tests cover unavailable data, quota errors, importing, filtering, and exports.
 
 ## Measurement boundaries
 
